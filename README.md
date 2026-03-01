@@ -1,7 +1,7 @@
 # Threat Hunting Tool – Python-based Security Analysis
 # Threat Hunting Tool 🛡️
 
-**Threat Hunting Tool** is a Python-based tool for proactive **threat detection** using structured JSON logs. It helps security analysts identify suspicious activity by correlating logs with known threat indicators.
+**Threat Hunting Tool** Python-based Threat Hunting Tool driven by Threat Intelligence (TIP). Detects suspicious IPs, domains, and other indicators in JSON logs using pre-defined threat intelligence lists.
 
 <img width="913" height="827" alt="image" src="https://github.com/user-attachments/assets/05b149eb-f68d-4368-9453-ce2febb2d2bd" />
 
