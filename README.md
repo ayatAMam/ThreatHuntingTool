@@ -3,7 +3,8 @@
 
 **Threat Hunting Tool** is a Python-based tool for proactive **threat detection** using structured JSON logs. It helps security analysts identify suspicious activity by correlating logs with known threat indicators.
 
----![Uploading image.png…]()
+<img width="1032" height="526" alt="image" src="https://github.com/user-attachments/assets/85ae3d6e-c8e2-44bd-a115-79efbf248fe8" />
+
 
 
 ## ⚡ Features
