@@ -10,16 +10,15 @@ It analyzes structured JSON logs and correlates IP addresses against one or more
 
 <img width="1123" height="194" alt="image" src="https://github.com/user-attachments/assets/6d4c1b67-c15a-4d04-ab61-40400a443bb8" />
 
-
-
-
-
-
-
+---
 
 <img width="1123" height="823" alt="image" src="https://github.com/user-attachments/assets/173f4285-4c1a-4d0d-9bd0-797d50aff06c" />
 
+---
+# python3 threat_hunting2.py logs.json <c2_list.json apt_list.json ransomware.csv botnet_list.json> 
+<c2_list.json apt_list.json ransomware.csv botnet_list.json> is Feeds Files
 
+---
 ## ⚡ Key Features
 
 - 🔍 Analyze JSON logs from any security control (Firewall, EDR, IDS, etc.)
@@ -47,7 +46,7 @@ It analyzes structured JSON logs and correlates IP addresses against one or more
 
 ## 📂 Supported Feed Formats
 
-### JSON Format
+### JSON  and CSV Format
 ```json
 [
   {"ip": "185.243.115.10"},
