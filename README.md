@@ -1,34 +1,47 @@
-# Threat Hunting Tool – Python-based Security Analysis
 # Threat Hunting Tool 🛡️
 
-**Threat Hunting Tool** Python-based Threat Hunting Tool driven by Threat Intelligence (TIP). Detects suspicious IPs, domains, and other indicators in JSON logs using pre-defined threat intelligence lists.
+## Threat Hunting Tool – Intelligence-Driven Security Analysis
 
-<img width="913" height="827" alt="image" src="https://github.com/user-attachments/assets/05b149eb-f68d-4368-9453-ce2febb2d2bd" />
+**Threat Hunting Tool** is a Python-based CLI tool designed for proactive threat detection using multiple Threat Intelligence (TIP) feeds.
+
+It analyzes structured JSON logs and correlates IP addresses against one or more external threat intelligence files (JSON or CSV), automatically classifying and scoring detected threats.
+
+---
+<img width="615" height="199" alt="image" src="https://github.com/user-attachments/assets/6ec2b6ad-3e22-4f96-ad88-90fe8d01efd0" />
 
 
-## ⚡ Features
+<img width="869" height="856" alt="image" src="https://github.com/user-attachments/assets/01a651de-322a-4e0c-87f6-628dc509626d" />
 
-- Analyze JSON logs from any security controls.
-- Supports threat intelligence JSON files (TIP) such as:
-  - `apt_list.json` – known APT indicators
-  - `c2_list.json` – Command & Control servers
-  - `botnet_list.json` – botnet IPs
-  - Or any custom JSON file containing IPs/domains classified by type.
-- Indicators can have a **score** to prioritize high-risk threats.
-- Fully **customizable**: add new classifications like IPs, Domains, or any other type.
-- Produces actionable output for **incident response** and **proactive threat hunting**.
+## ⚡ Key Features
+
+- 🔍 Analyze JSON logs from any security control (Firewall, EDR, IDS, etc.)
+- 📂 Supports multiple Threat Intelligence feeds at once
+- 📄 Accepts both **JSON and CSV** feed formats
+- 🧠 Automatic classification based on feed filename  
+  - `apt_list.json` → APT
+  - `c2_list.csv` → C2
+  - `botnet_feed.json` → BOTNET
+- 🎯 Built-in Risk Scoring system
+- 🎨 Color-coded output based on severity
+- 📊 Sorted results by highest risk score
+- 🖥️ Clean and professional CLI interface
+- 🆘 Built-in `--help` option
 
 ---
 
 ## 🛠️ Requirements
 
 - Python 3.x
-- JSON log files
-- Optional: pre-defined TIP JSON files (`apt_list.json`, `c2_list.json`, `botnet_list.json`, etc.)
+- JSON log file
+- One or more Threat Intelligence feed files (JSON or CSV)
 
 ---
 
-## 🚀 Usage
+## 📂 Supported Feed Formats
 
-```bash
-python3 threat_hunting.py <json_logs>
+### JSON Format
+```json
+[
+  {"ip": "185.243.115.10"},
+  {"ip": "45.67.89.200"}
+]
