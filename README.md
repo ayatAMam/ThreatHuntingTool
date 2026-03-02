@@ -13,6 +13,10 @@ It analyzes structured JSON logs and correlates IP addresses against one or more
 
 
 
+
+
+
+
 <img width="1123" height="823" alt="image" src="https://github.com/user-attachments/assets/173f4285-4c1a-4d0d-9bd0-797d50aff06c" />
 
 
