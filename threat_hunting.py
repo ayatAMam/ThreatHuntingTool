@@ -1,32 +1,41 @@
 #!/usr/bin/env python3
+
 import os
+import sys
 import json
-from collections import defaultdict
-import sys
-
-import sys
+import csv
 import time
-import os
+import argparse
+from collections import defaultdict
 
-# ====== CONFIG ======
-USER_NAME = "0xayat"   
+# =========================
+# CONFIG
+# =========================
+USER_NAME = "0xayat"
 
-# ====== CLEAR SCREEN ======
+GREEN  = "\033[92m"
+YELLOW = "\033[93m"
+RED    = "\033[91m"
+CYAN   = "\033[96m"
+RESET  = "\033[0m"
+
+# =========================
+# UI FUNCTIONS
+# =========================
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
-# ====== LOADING ANIMATION ======
 def loading_animation():
-    print("Initializing Threat Hunting Engine", end="")
+    print(f"{CYAN}Initializing Threat Hunting Engine", end="")
     for _ in range(5):
-        time.sleep(0.5)
+        time.sleep(0.4)
         print(".", end="")
         sys.stdout.flush()
-    print("\n")
+    print(RESET + "\n")
 
-# ====== BANNER ======
 def show_banner():
-    banner = r"""
+    banner = f"""
+{GREEN}
 ████████╗██╗  ██╗██████╗ ███████╗ █████╗ ████████╗
 ╚══██╔══╝██║  ██║██╔══██╗██╔════╝██╔══██╗╚══██╔══╝
    ██║   ███████║██████╔╝█████╗  ███████║   ██║   
@@ -35,99 +44,142 @@ def show_banner():
    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   
 
         Threat Hunting Tool
-    """
+{RESET}
+"""
     print(banner)
     print(f"👩‍💻 Developer: {USER_NAME}")
-    print("🚀 Version: 1.0")
-    print("=" * 60)
-    time.sleep(1.5)
+    print("🚀 Version: 2.0")
+    print("=" * 65)
+    time.sleep(1)
 
-# ====== START SCREEN ======
-def startup():
-    clear()
-    loading_animation()
-    show_banner()
+# =========================
+# ARGUMENT PARSER
+# =========================
+parser = argparse.ArgumentParser(
+    description="Threat Hunting Tool - Detect malicious IPs using multiple Threat Intelligence feeds"
+)
 
-startup()
+parser.add_argument(
+    "logs",
+    help="Path to JSON logs file"
+)
 
+parser.add_argument(
+    "feeds",
+    nargs="+",
+    help="One or more Threat Intelligence feed files (JSON or CSV)"
+)
 
+args = parser.parse_args()
 
-######### Base directory (same folder as script)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# =========================
+# START SCREEN
+# =========================
+clear()
+loading_animation()
+show_banner()
 
-######### Threat feeds with score
-threat_feeds = {
-    "C2": (os.path.join(BASE_DIR, "c2_list.json"), 5),
-    "Botnet": (os.path.join(BASE_DIR, "botnet_list.json"), 4),
-    "APT": (os.path.join(BASE_DIR, "apt_list.json"), 6)
-}
-
-######### Loader function
-def load_ip_list(filename):
-    with open(filename, "r") as f:
-        data = json.load(f)
-    return set(item["ip"] for item in data)
-
-######### Load all feeds automatically
-loaded_feeds = {}
-for threat_name, (filename, score) in threat_feeds.items():
-    loaded_feeds[threat_name] = {
-        "ips": load_ip_list(filename),
-        "score": score
-    }
-
-######### Load Logs from argument
-if len(sys.argv) < 2:
-    print("Usage: python3 script.py /path/to/Firewall_logs.json")
+# =========================
+# VALIDATE LOG FILE
+# =========================
+if not os.path.exists(args.logs):
+    print(f"{RED}Error: Logs file not found.{RESET}")
     sys.exit(1)
 
-logs_path = sys.argv[1]
-
-if not os.path.exists(logs_path):
-    print(f"Error: Logs file not found at {logs_path}")
-    sys.exit(1)
-
-with open(logs_path, "r") as f:
+# =========================
+# LOAD LOGS
+# =========================
+with open(args.logs, "r") as f:
     logs = json.load(f)
 
-######### Threat Matching Engine
+# =========================
+# LOAD FEEDS (JSON / CSV)
+# =========================
+def load_feed_file(filepath):
+    extension = filepath.split(".")[-1].lower()
+    ips = set()
+
+    if extension == "json":
+        with open(filepath, "r") as f:
+            data = json.load(f)
+            for item in data:
+                if "ip" in item:
+                    ips.add(item["ip"])
+
+    elif extension == "csv":
+        with open(filepath, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row:
+                    ips.add(row[0])
+
+    else:
+        print(f"{YELLOW}Unsupported file format skipped: {filepath}{RESET}")
+
+    return ips
+
+# =========================
+# BUILD THREAT FEEDS
+# =========================
+threat_feeds = {}
+
+for feed_path in args.feeds:
+
+    if not os.path.exists(feed_path):
+        print(f"{RED}Feed file not found: {feed_path}{RESET}")
+        continue
+
+    # Classification based on file name
+    feed_name = os.path.basename(feed_path).split("_")[0].upper()
+
+    threat_feeds[feed_name] = {
+        "ips": load_feed_file(feed_path),
+        "score": 5   # default score 
+    }
+
+if not threat_feeds:
+    print(f"{RED}No valid threat feeds loaded.{RESET}")
+    sys.exit(1)
+
+# =========================
+# THREAT MATCHING ENGINE
+# =========================
 ip_scores = defaultdict(lambda: {"score": 0, "reasons": []})
 
 for log in logs:
-    ip = log["ip_address"]
+    ip = log.get("ip_address")
+    if not ip:
+        continue
 
-    for threat_name, feed_data in loaded_feeds.items():
-        # Score counted once per feed per IP
+    for threat_name, feed_data in threat_feeds.items():
         if ip in feed_data["ips"]:
             if threat_name not in ip_scores[ip]["reasons"]:
                 ip_scores[ip]["score"] += feed_data["score"]
                 ip_scores[ip]["reasons"].append(threat_name)
 
-######### ALERT
-# ANSI color codes
-GREEN  = "\033[92m"
-YELLOW = "\033[93m"
-RED    = "\033[91m"
-RESET  = "\033[0m"
-
-# Table header with borders
-header = f"| {'IP Address':<15} | {'Risk Score':<10} | {'Threats':<20} |"
+# =========================
+# OUTPUT TABLE
+# =========================
+header = f"| {'IP Address':<15} | {'Risk Score':<10} | {'Threats':<25} |"
 separator = "-" * len(header)
+
 print(separator)
 print(header)
 print(separator)
 
-for ip, data in ip_scores.items():
-    if data["score"] > 0:
-        # Determine color based on score
-        if data["score"] > 5:
-            color = RED
-        elif data["score"] >= 4:
-            color = YELLOW
-        else:
-            color = GREEN
-        
-        threats = ", ".join(data["reasons"])
-        print(f"| {color}{ip:<15} | {data['score']:<10} | {threats:<20}{RESET} |")
+for ip, data in sorted(ip_scores.items(), key=lambda x: x[1]["score"], reverse=True):
+
+    if data["score"] == 0:
+        continue
+
+    if data["score"] >= 10:
+        color = RED
+    elif data["score"] >= 5:
+        color = YELLOW
+    else:
+        color = GREEN
+
+    threats = ", ".join(data["reasons"])
+    print(f"| {color}{ip:<15} | {data['score']:<10} | {threats:<25}{RESET} |")
 
 print(separator)
