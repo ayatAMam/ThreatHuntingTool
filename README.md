@@ -7,7 +7,8 @@
 It analyzes structured JSON logs and correlates IP addresses against one or more external threat intelligence files (JSON or CSV), automatically classifying and scoring detected threats.
 
 ---
-<img width="615" height="199" alt="image" src="https://github.com/user-attachments/assets/6ec2b6ad-3e22-4f96-ad88-90fe8d01efd0" />
+<img width="968" height="192" alt="image" src="https://github.com/user-attachments/assets/6f5b381d-2170-434c-b7d0-a59e781f8116" />
+
 
 
 <img width="869" height="856" alt="image" src="https://github.com/user-attachments/assets/01a651de-322a-4e0c-87f6-628dc509626d" />
